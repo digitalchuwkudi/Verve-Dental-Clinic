@@ -928,7 +928,7 @@ const Footer = () => {
 
         {/* Bottom Section - Massive Logo */}
         <div className="flex flex-col items-center justify-center">
-          <h1 className="text-[22vw] leading-none font-bold font-anton tracking-tighter text-[#E6F4F1] text-center w-full select-none">
+          <h1 className="text-[28vw] md:text-[22vw] leading-none font-bold font-anton tracking-tighter text-[#E6F4F1] text-center w-full select-none">
             Verve
           </h1>
           <p className="text-[#E6F4F1] text-sm mt-8 text-center">
