@@ -74,7 +74,7 @@ const Navbar = () => {
               <Smile size={24} />
             </div>
             <span className={`font-heading font-bold text-2xl tracking-tight ${isScrolled ? 'text-[#0A1F1C]' : 'text-[#E6F4F1]'}`}>
-              VerveDent
+              VerveDentist
             </span>
           </div>
           
@@ -781,7 +781,7 @@ const Appointment = () => {
 
 const FAQ = () => {
   const faqs = [
-    { q: "What services does VerveDent offer?", a: "We offer a comprehensive range of dental services including general checkups, teeth whitening, implants, orthodontics, and cosmetic dentistry." },
+    { q: "What services does VerveDentist offer?", a: "We offer a comprehensive range of dental services including general checkups, teeth whitening, implants, orthodontics, and cosmetic dentistry." },
     { q: "How often should I visit the dentist?", a: "We recommend visiting the dentist every six months for a routine checkup and professional cleaning." },
     { q: "Do dental treatments hurt?", a: "We prioritize your comfort. With modern techniques and anesthetics, most treatments are virtually pain-free." },
     { q: "How do I know which treatment is right for me?", a: "During your initial consultation, our experts will evaluate your oral health and discuss your goals to recommend a personalized treatment plan." },
@@ -879,8 +879,8 @@ const Footer = () => {
               </div>
               <div className="flex items-start gap-4">
                 <div className="w-8 flex justify-center mt-1"><Mail className="text-accent-green shrink-0" size={24} /></div>
-                <a href="mailto:hello@vervedent.com" className="inline-block text-slate-300 text-[18px] font-normal font-poppins tracking-tight hover:text-accent-green transition-colors">
-                  hello@vervedent.com
+                <a href="mailto:hello@vervedentist.com" className="inline-block text-slate-300 text-[18px] font-normal font-poppins tracking-tight hover:text-accent-green transition-colors">
+                  hello@vervedentist.com
                 </a>
               </div>
             </div>
@@ -932,7 +932,7 @@ const Footer = () => {
             Verve
           </h1>
           <p className="text-[#E6F4F1] text-sm mt-8 text-center">
-            &copy; {new Date().getFullYear()} VerveDent Clinic. All rights reserved.
+            &copy; {new Date().getFullYear()} VerveDentist Clinic. All rights reserved.
           </p>
           <p className="text-accent-green text-sm mt-2 text-center font-medium">
             Cooked by Digital Chukwudi
