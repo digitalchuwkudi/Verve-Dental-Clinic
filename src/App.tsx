@@ -843,7 +843,7 @@ const FAQ = () => {
 
 const Footer = () => {
   return (
-    <footer className="bg-[#0A1F1C] text-[#E6F4F1] pt-24 pb-8 overflow-hidden font-sans">
+    <footer id="contact" className="bg-[#0A1F1C] text-[#E6F4F1] pt-24 pb-8 overflow-hidden font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Top Section */}
