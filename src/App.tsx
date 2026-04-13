@@ -278,7 +278,7 @@ const About = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <span className="text-accent-green font-semibold tracking-wider uppercase text-sm mb-4 block text-center">About Us</span>
+            <span className="w-fit mx-auto px-4 py-1.5 rounded-full bg-[#0A1F1C]/90 text-accent-green font-semibold tracking-wider uppercase text-sm mb-4 block text-center">About Us</span>
             <h2 className="text-[40px] md:text-[50px] font-bold font-anton text-slate-900 mb-6 leading-tight text-center">
               Our Dental Clinic
             </h2>
@@ -359,7 +359,7 @@ const Services = () => {
     <section id="services" className="py-24 bg-[#E6F4F1]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-accent-green font-semibold tracking-wider uppercase text-sm mb-4 block">Our Services</span>
+          <span className="w-fit mx-auto px-4 py-1.5 rounded-full bg-[#0A1F1C]/90 text-accent-green font-semibold tracking-wider uppercase text-sm mb-4 block">Our Services</span>
           <h2 className="text-[40px] md:text-[50px] font-bold font-anton text-slate-900 mb-6 leading-tight">Comprehensive Dental Services</h2>
           <p className="text-[20px] font-normal font-poppins text-slate-600">
             Everything you need for a healthy and beautiful smile, all in one place.
@@ -471,7 +471,7 @@ const Gallery = () => {
     <section id="results" className="py-24 bg-[#E6F4F1]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-accent-green font-semibold tracking-wider uppercase text-sm mb-4 block">Gallery</span>
+          <span className="w-fit mx-auto px-4 py-1.5 rounded-full bg-[#0A1F1C]/90 text-accent-green font-semibold tracking-wider uppercase text-sm mb-4 block">Gallery</span>
           <h2 className="text-[40px] md:text-[50px] font-bold font-anton text-slate-900 mb-6">Real Results, Real Smiles</h2>
           <p className="text-[20px] font-normal font-poppins text-slate-600">
             See the transformation and confidence our treatments bring to our patients.
@@ -522,7 +522,7 @@ const HowItWorks = () => {
     <section className="py-24 bg-[#E6F4F1]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-accent-green font-semibold tracking-wider uppercase text-sm mb-4 block text-center">Our Working Process</span>
+          <span className="w-fit mx-auto px-4 py-1.5 rounded-full bg-[#0A1F1C]/90 text-accent-green font-semibold tracking-wider uppercase text-sm mb-4 block text-center">Our Working Process</span>
           <h2 className="text-[40px] md:text-[50px] font-bold font-anton text-slate-900 mb-6">Simple Steps to Your Perfect Smile</h2>
         </div>
 
@@ -575,7 +575,7 @@ const Testimonials = () => {
     <section id="testimonials" className="py-24 bg-[#E6F4F1] overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-accent-green font-semibold tracking-wider uppercase text-sm mb-4 block text-center">Reviews</span>
+          <span className="w-fit mx-auto px-4 py-1.5 rounded-full bg-[#0A1F1C]/90 text-accent-green font-semibold tracking-wider uppercase text-sm mb-4 block text-center">Reviews</span>
           <h2 className="text-[40px] md:text-[50px] font-bold font-anton text-slate-900 mb-6">What Our Patients Say</h2>
         </div>
 
@@ -972,7 +972,7 @@ const Team = () => {
     <section id="team" className="py-24 bg-[#E6F4F1]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-accent-green font-semibold tracking-wider uppercase text-sm mb-4 block">Our Experts</span>
+          <span className="w-fit mx-auto px-4 py-1.5 rounded-full bg-[#0A1F1C]/90 text-accent-green font-semibold tracking-wider uppercase text-sm mb-4 block">Our Experts</span>
           <h2 className="text-[40px] md:text-[50px] font-bold font-anton text-slate-900 mb-6">Meet the Team</h2>
           <p className="text-[20px] font-normal font-poppins text-slate-600">
             Get to know our highly skilled and compassionate dental professionals who are dedicated to your smile.
