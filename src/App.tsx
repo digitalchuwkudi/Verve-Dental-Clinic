@@ -135,14 +135,14 @@ const Hero = () => {
         {/* Background Video */}
         <div className="absolute inset-0 z-0">
           <video 
-            src="https://res.cloudinary.com/dx41voszq/video/upload/q_auto,f_auto/v1775748213/Dental_website_au1wod.mp4" 
+            src="https://res.cloudinary.com/dx41voszq/video/upload/q_auto:good,f_auto,w_1920,vc_auto/v1775748213/Dental_website_au1wod.mp4" 
             autoPlay 
             loop 
             muted 
             playsInline
             disablePictureInPicture
             preload="auto"
-            className="w-full h-full object-cover object-[center_30%] md:object-[center_50%] lg:object-[center_30%]"
+            className="w-full h-full object-cover"
             style={{ 
               transform: 'translate3d(0, 0, 0)', 
               willChange: 'transform',
