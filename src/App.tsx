@@ -58,11 +58,20 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
+    let timeoutId: number | null = null;
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > window.innerHeight / 2);
+      if (timeoutId === null) {
+        timeoutId = window.setTimeout(() => {
+          setIsScrolled(window.scrollY > 300);
+          timeoutId = null;
+        }, 50);
+      }
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (timeoutId !== null) window.clearTimeout(timeoutId);
+    };
   }, []);
 
   return (
@@ -135,7 +144,7 @@ const Hero = () => {
         {/* Background Video */}
         <div className="absolute inset-0 z-0">
           <video 
-            src="https://res.cloudinary.com/dx41voszq/video/upload/q_auto:good,f_auto,w_1920,vc_auto/v1775748213/Dental_website_au1wod.mp4" 
+            src="https://res.cloudinary.com/dx41voszq/video/upload/q_auto,f_auto,w_1280/v1775748213/Dental_website_au1wod.mp4" 
             autoPlay 
             loop 
             muted 
@@ -885,6 +894,18 @@ const Footer = () => {
               </div>
             </div>
           </div>
+          
+          {/* AI Assistant CTA */}
+          <div className="mt-16 flex flex-col items-center text-center space-y-4">
+            <p className="text-slate-400 text-lg font-poppins mb-2">Want answers immediately without waiting? Talk to our intelligent assistant.</p>
+            <button 
+              onClick={() => window.dispatchEvent(new Event('open-chat'))}
+              className="group bg-accent-green text-[#0A1F1C] px-8 py-4 rounded-full font-bold text-[18px] hover:bg-[#86c52a] hover:-translate-y-1 transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-accent-green/20"
+            >
+              <MessageCircle size={24} className="group-hover:scale-110 transition-transform" />
+              Chat with AI Assistant Now
+            </button>
+          </div>
         </div>
 
         {/* Full Divider */}
@@ -1016,17 +1037,21 @@ const ScrollToTop = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    let timeoutId: number | null = null;
     const toggleVisibility = () => {
-      // Show button when user scrolls halfway down the page
-      if (window.scrollY > document.documentElement.scrollHeight / 3) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
+      if (timeoutId === null) {
+        timeoutId = window.setTimeout(() => {
+          setIsVisible(window.scrollY > 800);
+          timeoutId = null;
+        }, 50);
       }
     };
 
-    window.addEventListener('scroll', toggleVisibility);
-    return () => window.removeEventListener('scroll', toggleVisibility);
+    window.addEventListener('scroll', toggleVisibility, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', toggleVisibility);
+      if (timeoutId !== null) window.clearTimeout(timeoutId);
+    };
   }, []);
 
   const scrollToTop = () => {

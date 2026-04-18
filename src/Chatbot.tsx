@@ -33,10 +33,13 @@ FAQs:
 
 Rules:
 1. Be very friendly and sound like a real human receptionist. Use conversational phrases. NEVER mention that you are an AI or bot.
-2. Answer their questions clearly using the provided info.
-3. Don't let the lead go! After answering their initial query, naturally ask for their name and phone number so a dental specialist can reach out to them directly.
-4. ONCE THEY PROVIDE THEIR NAME AND PHONE NUMBER, you MUST call the "capture_lead" tool. 
-5. After calling the tool, wrap up the conversation. Thank them warmly and tell them our team will be in touch shortly.`;
+2. KEEP YOUR ANSWERS SHORT AND CONCISE. Aim for 1 to 2 short sentences per reply, but use more ONLY if the specific answer requires detailed information. Do not write long paragraphs so it doesn't stress the user.
+3. Answer their questions clearly using the provided info.
+4. Don't let the lead go! After answering their initial query, naturally ask for their name and phone number so a dental specialist can reach out to them directly.
+5. ONCE THEY PROVIDE THEIR NAME AND PHONE NUMBER, you MUST call the "capture_lead" tool immediately. 
+6. After calling the tool, thank them warmly, tell them our team will be in touch shortly, and ASK: "Is there anything else I can help you with today?".
+7. If they reply that they don't need help with anything else (e.g., "no", "thank you", "that's all"), wish them a great day and conclude the conversation gracefully.
+8. Only call the "capture_lead" tool ONCE per conversation.`;
 
 const captureLeadDeclaration: FunctionDeclaration = {
   name: "capture_lead",
@@ -62,6 +65,54 @@ export default function Chatbot() {
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [leadCaptured, setLeadCaptured] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesRef = useRef(messages);
+  const leadCapturedRef = useRef(leadCaptured);
+
+  useEffect(() => {
+    const handleOpenChat = () => setIsOpen(true);
+    window.addEventListener('open-chat', handleOpenChat);
+    return () => window.removeEventListener('open-chat', handleOpenChat);
+  }, []);
+
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
+
+  useEffect(() => {
+    leadCapturedRef.current = leadCaptured;
+  }, [leadCaptured]);
+
+  const sendLeadSilently = async (name: string, phone: string, currentMessages: Message[]) => {
+    try {
+      const transcript = currentMessages.map(m => `${m.role === 'user' ? 'Lead' : 'VerveDentist'}: ${m.content}`).join('\n\n');
+      await fetch('/api/send-lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, phone, transcript })
+      });
+    } catch (e) {
+      console.error("Failed to forward lead", e);
+    }
+  };
+
+  useEffect(() => {
+    // Only start the 5-minute auto-close timer AFTER the lead has provided their name and number
+    if (!leadCapturedRef.current) return;
+
+    const hasUserMessage = messages.some(m => m.role === 'user');
+    if (!hasUserMessage) return;
+
+    const timer = setTimeout(() => {
+      setMessages(prev => {
+        // Prevent adding multiple closing messages if they are already there
+        if (prev.length > 0 && prev[prev.length - 1].content.includes("stepped away")) return prev;
+        return [...prev, { role: 'model', content: "It looks like you've stepped away, so I'll close our chat for now. Have a wonderful day!" }];
+      });
+      // Email is already forwarded upon capture, so we just end the chat smoothly.
+    }, 5 * 60 * 1000); // 5 minutes timeout
+
+    return () => clearTimeout(timer);
+  }, [messages, leadCaptured]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -79,19 +130,6 @@ export default function Chatbot() {
       utterance.rate = 1.0;
       utterance.pitch = 1.0;
       window.speechSynthesis.speak(utterance);
-    }
-  };
-
-  const sendLeadSilently = async (name: string, phone: string, currentMessages: Message[]) => {
-    try {
-      const transcript = currentMessages.map(m => `${m.role === 'user' ? 'Lead' : 'VerveDentist'}: ${m.content}`).join('\n\n');
-      await fetch('/api/send-lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, transcript })
-      });
-    } catch (e) {
-      console.error("Failed to forward lead", e);
     }
   };
 
@@ -124,16 +162,16 @@ export default function Chatbot() {
       
       // Check for function call
       if (response.functionCalls && response.functionCalls.length > 0) {
-         setLeadCaptured(true);
          const call = response.functionCalls.find(fc => fc.name === "capture_lead");
          
-         if (call && call.args) {
+         if (call && call.args && !leadCaptured) {
+            setLeadCaptured(true);
             const argMap = call.args as Record<string, any>;
             sendLeadSilently(argMap.name || "Unknown", argMap.phone || "Unknown", newMessages);
          }
 
          if (!replyText) {
-             replyText = "Thank you so much! Our team has received your details and will be in touch with you shortly. Have a great day!";
+             replyText = "Thank you so much! Our team has received your details and will be in touch with you shortly. Is there anything else I can help you with today?";
          }
       } else if (!replyText) {
           replyText = "I'm sorry, I couldn't process that.";

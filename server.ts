@@ -31,14 +31,15 @@ ${transcript}
         method: "POST",
         headers: { 
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          'Origin': 'https://vervedentist-ai.com',
+          'Referer': 'https://vervedentist-ai.com/'
         },
         body: JSON.stringify({
-          _subject: `Urgent: New Dental Lead Captured - ${name}`,
-          name: "VerveDentist AI Assistant",
-          lead_name: name,
-          lead_phone: phone,
-          message: emailContent
+          _subject: `Urgent: Dental Lead - ${name}`,
+          "Lead Name": name,
+          "Phone Number": phone,
+          "Chat Transcript": transcript
         })
       });
 
