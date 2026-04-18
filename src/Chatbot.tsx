@@ -1,10 +1,52 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Mic, Volume2, VolumeX, Loader2, MessageSquareShare } from 'lucide-react';
+import { GoogleGenAI, Type, FunctionDeclaration } from '@google/genai';
 
 interface Message {
   role: 'user' | 'model';
   content: string;
 }
+
+const SYSTEM_PROMPT = `You are a warm, highly professional, and human-like receptionist for the VerveDentist clinic. 
+Your goal is to answer initial questions, build trust, and ultimately capture the lead by getting their name and phone number so the clinic can follow up with them.
+
+Here is all the information about VerveDentist:
+- Email: madudimcjx@gmail.com
+- Phone / WhatsApp: +229 01 92 20 66 12
+- Address: 123 Medical Plaza, Suite 400, New York, NY 10001
+- Working Hours: Monday - Sunday (5am - 6pm)
+- Services: General Checkups & Cleaning, Teeth Whitening, Dental Implants, Braces & Orthodontics, Cosmetic Dentistry, Emergency Dental Care.
+- Benefits: Expert Team, Painless Care, Affordable payment plans, Flexible (evening and weekend slots).
+- How it works: 1. Book appointment 2. Consultation 3. Personalized Treatment 4. Enjoy confident smile.
+
+FAQs:
+- Hurt? We prioritize comfort with modern techniques and anesthetics. Most treatments are pain-free.
+- How to know which treatment? During initial consultation, experts evaluate oral health and discuss goals.
+- Cosmetic safe? Yes, performed by certified professionals.
+- Insurance/Payment? We accept most major dental insurances and offer flexible payment plans.
+
+Rules:
+1. Be very friendly and sound like a real human receptionist. Use conversational phrases. NEVER mention that you are an AI or bot.
+2. KEEP YOUR ANSWERS SHORT AND CONCISE. Aim for 1 to 2 short sentences per reply, but use more ONLY if the specific answer requires detailed information. Do not write long paragraphs so it doesn't stress the user.
+3. Answer their questions clearly using the provided info.
+4. Don't let the lead go! After answering their initial query, naturally ask for their name and phone number so a dental specialist can reach out to them directly.
+5. ONCE THEY PROVIDE THEIR NAME AND PHONE NUMBER, you MUST call the "capture_lead" tool immediately. 
+6. After calling the tool, thank them warmly, tell them our team will be in touch shortly, and ASK: "Is there anything else I can help you with today?".
+7. If they reply that they don't need help with anything else (e.g., "no", "thank you", "that's all"), wish them a great day and conclude the conversation gracefully.
+8. Only call the "capture_lead" tool ONCE per conversation.`;
+
+const captureLeadDeclaration: FunctionDeclaration = {
+  name: "capture_lead",
+  description: "Call this tool once the user has provided their name and phone number.",
+  parameters: {
+    type: Type.OBJECT,
+    properties: {
+      name: { type: Type.STRING, description: "The full name of the lead" },
+      phone: { type: Type.STRING, description: "The phone number of the lead" }
+    },
+    required: ["name", "phone"]
+  }
+};
 
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,6 +61,25 @@ export default function Chatbot() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef(messages);
   const leadCapturedRef = useRef(leadCaptured);
+
+  const [aiClient, setAiClient] = useState<GoogleGenAI | null>(null);
+
+  useEffect(() => {
+    // Attempt to load static bundle key first
+    if ((import.meta as any).env?.VITE_GEMINI_API_KEY) {
+      setAiClient(new GoogleGenAI({ apiKey: (import.meta as any).env.VITE_GEMINI_API_KEY }));
+    } else {
+      // If not bundled (e.g., deployed prod), fetch the runtime key from our secure endpoint
+      fetch('/api/config')
+        .then(res => res.json())
+        .then(data => {
+          if (data.apiKey) {
+            setAiClient(new GoogleGenAI({ apiKey: data.apiKey }));
+          }
+        })
+        .catch(err => console.error("Failed to fetch runtime config", err));
+    }
+  }, []);
 
   useEffect(() => {
     const handleOpenChat = () => setIsOpen(true);
@@ -94,26 +155,45 @@ export default function Chatbot() {
     setInput('');
     setIsLoading(true);
 
+    if (!aiClient) {
+      setMessages(prev => [...prev, { role: 'model', content: "The AI agent is currently initializing or missing its configuration. Please wait a moment or notify the administrator." }]);
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: newMessages })
+      const contents = newMessages.map(m => ({
+        role: m.role,
+        parts: [{ text: m.content }]
+      }));
+
+      const response = await aiClient.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: contents,
+        config: {
+          systemInstruction: SYSTEM_PROMPT,
+          tools: [{ functionDeclarations: [captureLeadDeclaration] }],
+          toolConfig: { includeServerSideToolInvocations: true }
+        }
       });
 
-      if (!response.ok) {
-         throw new Error("Chat API failed");
-      }
+      let replyText = response.text || "";
       
-      const data = await response.json();
-
-      let replyText = data.replyText || "";
-      
-      if (data.capturedLead) {
-         if (!leadCaptured) {
+      // Check for function call
+      if (response.functionCalls && response.functionCalls.length > 0) {
+         const call = response.functionCalls.find(fc => fc.name === "capture_lead");
+         
+         if (call && call.args && !leadCaptured) {
             setLeadCaptured(true);
-            sendLeadSilently(data.capturedLead.name || "Unknown", data.capturedLead.phone || "Unknown", newMessages);
+            const argMap = call.args as Record<string, any>;
+            sendLeadSilently(argMap.name || "Unknown", argMap.phone || "Unknown", newMessages);
          }
+
+         if (!replyText) {
+             replyText = "Thank you so much! Our team has received your details and will be in touch with you shortly. Is there anything else I can help you with today?";
+         }
+      } else if (!replyText) {
+          replyText = "I'm sorry, I couldn't process that.";
       }
 
       setMessages(prev => [...prev, { role: 'model', content: replyText }]);
