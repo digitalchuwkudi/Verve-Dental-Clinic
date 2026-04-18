@@ -10,12 +10,6 @@ async function startServer() {
   app.use(cors());
   app.use(express.json());
 
-  // Expose the runtime API key to the frontend so it works in deployed environments
-  // where the key is only available at runtime and not at build time.
-  app.get("/api/config", (req, res) => {
-    res.json({ apiKey: process.env.GEMINI_API_KEY || "" });
-  });
-
   // API Route to forward lead emails
   app.post("/api/send-lead", async (req, res) => {
     try {

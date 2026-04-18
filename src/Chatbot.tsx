@@ -48,6 +48,12 @@ const captureLeadDeclaration: FunctionDeclaration = {
   }
 };
 
+const apiKey = process.env.GEMINI_API_KEY;
+let aiClient: GoogleGenAI | null = null;
+if (apiKey) {
+  aiClient = new GoogleGenAI({ apiKey });
+}
+
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -61,25 +67,6 @@ export default function Chatbot() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef(messages);
   const leadCapturedRef = useRef(leadCaptured);
-
-  const [aiClient, setAiClient] = useState<GoogleGenAI | null>(null);
-
-  useEffect(() => {
-    // Attempt to load static bundle key first
-    if ((import.meta as any).env?.VITE_GEMINI_API_KEY) {
-      setAiClient(new GoogleGenAI({ apiKey: (import.meta as any).env.VITE_GEMINI_API_KEY }));
-    } else {
-      // If not bundled (e.g., deployed prod), fetch the runtime key from our secure endpoint
-      fetch('/api/config')
-        .then(res => res.json())
-        .then(data => {
-          if (data.apiKey) {
-            setAiClient(new GoogleGenAI({ apiKey: data.apiKey }));
-          }
-        })
-        .catch(err => console.error("Failed to fetch runtime config", err));
-    }
-  }, []);
 
   useEffect(() => {
     const handleOpenChat = () => setIsOpen(true);
@@ -149,17 +136,16 @@ export default function Chatbot() {
   const handleSend = async (text: string) => {
     if (!text.trim()) return;
 
+    if (!aiClient) {
+      setMessages(prev => [...prev, { role: 'model', content: "Sorry, I am currently disconnected. Please make sure your Gemini API key is securely configured in your AI Studio Secrets panel." }]);
+      return;
+    }
+
     const userMessage: Message = { role: 'user', content: text };
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
     setInput('');
     setIsLoading(true);
-
-    if (!aiClient) {
-      setMessages(prev => [...prev, { role: 'model', content: "The AI agent is currently initializing or missing its configuration. Please wait a moment or notify the administrator." }]);
-      setIsLoading(false);
-      return;
-    }
 
     try {
       const contents = newMessages.map(m => ({
