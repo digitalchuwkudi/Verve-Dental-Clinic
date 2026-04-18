@@ -879,8 +879,8 @@ const Footer = () => {
               </div>
               <div className="flex items-start gap-4">
                 <div className="w-8 flex justify-center mt-1"><Mail className="text-accent-green shrink-0" size={24} /></div>
-                <a href="mailto:hello@vervedentist.com" className="inline-block text-slate-300 text-[18px] font-normal font-poppins tracking-tight hover:text-accent-green transition-colors">
-                  hello@vervedentist.com
+                <a href="mailto:madudimcjx@gmail.com" className="inline-block text-slate-300 text-[18px] font-normal font-poppins tracking-tight hover:text-accent-green transition-colors">
+                  madudimcjx@gmail.com
                 </a>
               </div>
             </div>
@@ -1054,11 +1054,14 @@ const ScrollToTop = () => {
   );
 };
 
+import Chatbot from './Chatbot';
+
 export default function App() {
   return (
     <div className="min-h-screen bg-[#E6F4F1] dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans selection:bg-primary selection:text-[#E6F4F1] transition-colors duration-300">
       <ScrollToTop />
       <Navbar />
+      <Chatbot />
       <main>
         <Hero />
         <About />
