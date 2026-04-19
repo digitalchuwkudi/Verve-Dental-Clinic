@@ -194,9 +194,13 @@ export default function Chatbot() {
 
       setMessages(prev => [...prev, { role: 'model', content: replyText }]);
       speak(replyText);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      setMessages(prev => [...prev, { role: 'model', content: "Sorry, I'm having trouble connecting right now. Please try again later." }]);
+      const errorMessage = error?.message || "Unknown error";
+      setMessages(prev => [...prev, { 
+        role: 'model', 
+        content: `Sorry, I'm having trouble connecting right now. Reason: ${errorMessage}. If this says 'API key not valid', please double check your Gemini key.` 
+      }]);
     } finally {
       setIsLoading(false);
     }
