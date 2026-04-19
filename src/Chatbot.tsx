@@ -125,7 +125,11 @@ export default function Chatbot() {
     }
 
     const userMessage: Message = { role: 'user', content: text };
-    const newMessages = [...messages, userMessage];
+    // Use messagesRef to guarantee we always have the latest chat history, 
+    // even when triggered asynchronously by the voice API's onend event
+    const currentMessages = messagesRef.current;
+    const newMessages = [...currentMessages, userMessage];
+    
     setMessages(newMessages);
     setInput('');
     setIsLoading(true);
@@ -191,17 +195,29 @@ export default function Chatbot() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     
+    // Stop recording when they finish their sentence
     recognition.continuous = false;
-    recognition.interimResults = false;
+    // Show words live on the screen as they speak
+    recognition.interimResults = true;
     
+    let finalTranscript = '';
+
     recognition.onstart = () => {
       setIsListening(true);
+      setInput(''); // Clear input for fresh voice message
     };
     
     recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
-      setInput(prev => (prev + " " + transcript).trim());
-      setIsListening(false);
+      let interimTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        } else {
+          interimTranscript += event.results[i][0].transcript;
+        }
+      }
+      // Update input text in real-time
+      setInput(finalTranscript + interimTranscript);
     };
     
     recognition.onerror = () => {
@@ -210,6 +226,10 @@ export default function Chatbot() {
     
     recognition.onend = () => {
       setIsListening(false);
+      // Magically auto-send the text once they stop talking to feel like a real AI agent
+      if (finalTranscript.trim()) {
+        handleSend(finalTranscript.trim());
+      }
     };
 
     recognition.start();
