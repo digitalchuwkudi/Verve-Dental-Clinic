@@ -1,44 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Mic, Volume2, VolumeX, Loader2, MessageSquareShare } from 'lucide-react';
 import { GoogleGenAI, Type, FunctionDeclaration } from '@google/genai';
+import { CLIENT_CONFIG, getSystemPrompt, getPostCapturePrompt } from './clientConfig';
 
 interface Message {
   role: 'user' | 'model';
   content: string;
 }
-
-const SYSTEM_PROMPT = `You are a warm, highly professional, and human-like receptionist for the VerveDentist clinic. 
-Your goal is to answer initial questions, build trust, and ultimately capture the lead by getting their name and phone number so the clinic can follow up with them.
-
-Here is all the information about VerveDentist:
-- Email: madudimcjx@gmail.com
-- Phone / WhatsApp: +229 01 92 20 66 12
-- Address: 123 Medical Plaza, Suite 400, New York, NY 10001
-- Working Hours: Monday - Sunday (5am - 6pm)
-- Services: General Checkups & Cleaning, Teeth Whitening, Dental Implants, Braces & Orthodontics, Cosmetic Dentistry, Emergency Dental Care.
-- Benefits: Expert Team, Painless Care, Affordable payment plans, Flexible (evening and weekend slots).
-- How it works: 1. Book appointment 2. Consultation 3. Personalized Treatment 4. Enjoy confident smile.
-
-FAQs:
-- Hurt? We prioritize comfort with modern techniques and anesthetics. Most treatments are pain-free.
-- How to know which treatment? During initial consultation, experts evaluate oral health and discuss goals.
-- Cosmetic safe? Yes, performed by certified professionals.
-- Insurance/Payment? We accept most major dental insurances and offer flexible payment plans.
-
-Rules:
-1. Be very friendly and sound like a real human receptionist. Use conversational phrases. NEVER mention that you are an AI or bot.
-2. KEEP YOUR ANSWERS SHORT AND CONCISE. Aim for 1 to 2 short sentences per reply, but use more ONLY if the specific answer requires detailed information. Do not write long paragraphs so it doesn't stress the user.
-3. Answer their questions clearly using the provided info.
-4. Build rapport first! Answer 1 or 2 of their initial questions to provide value. Only after assisting them naturally, ask if they would like a dental specialist to reach out, and request their name and phone number. DO NOT ask for their contact info in your very first response unless they explicitly ask to book an appointment.
-5. ONCE THEY PROVIDE THEIR NAME AND PHONE NUMBER, you MUST call the "capture_lead" tool immediately. 
-6. After calling the tool, thank them warmly, tell them our team will be in touch shortly, and ASK: "Is there anything else I can help you with today?".
-7. If they reply that they don't need help with anything else (e.g., "no", "thank you", "that's all"), wish them a great day and conclude the conversation gracefully.
-8. Only call the "capture_lead" tool ONCE per conversation.`;
-
-const POST_CAPTURE_SYSTEM_PROMPT = `You are a warm, highly professional receptionist for the VerveDentist clinic. 
-The user has ALREADY provided their contact details and the team will reach out to them. 
-Answer any remaining questions naturally. 
-If they say no, or indicate they don't need anything else (e.g., "no thanks", "no"), simply wish them a great day and say goodbye. Keep it short. Do NOT ask for their contact information again.`;
 
 const captureLeadDeclaration: FunctionDeclaration = {
   name: "capture_lead",
@@ -62,7 +30,7 @@ if (apiKey) {
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', content: "Hello! How are you today? I'm the VerveDentist assistant. How can I help you today?" }
+    { role: 'model', content: CLIENT_CONFIG.greetingMessage }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -89,17 +57,17 @@ export default function Chatbot() {
 
   const sendLeadSilently = async (name: string, phone: string, currentMessages: Message[]) => {
     try {
-      const transcript = currentMessages.map(m => `${m.role === 'user' ? 'Lead' : 'VerveDentist'}: ${m.content}`).join('\n\n');
+      const transcript = currentMessages.map(m => `${m.role === 'user' ? 'Lead' : CLIENT_CONFIG.companyName}: ${m.content}`).join('\n\n');
       
       // Send directly to formsubmit.co for fully static hosting environments (like Cloudflare Pages)
-      await fetch("https://formsubmit.co/ajax/madudimcjx@gmail.com", {
+      await fetch(`https://formsubmit.co/ajax/${CLIENT_CONFIG.notificationEmail}`, {
         method: "POST",
         headers: { 
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
         body: JSON.stringify({
-          _subject: `Urgent: Dental Lead - ${name}`,
+          _subject: `Urgent: New Lead - ${name}`,
           "Lead Name": name,
           "Phone Number": phone,
           "Chat Transcript": transcript
@@ -172,7 +140,7 @@ export default function Chatbot() {
         model: 'gemini-3-flash-preview',
         contents: contents,
         config: {
-          systemInstruction: leadCapturedRef.current ? POST_CAPTURE_SYSTEM_PROMPT : SYSTEM_PROMPT,
+          systemInstruction: leadCapturedRef.current ? getPostCapturePrompt() : getSystemPrompt(),
           // Hide the tool from Gemini once we've successfully captured the lead
           // This prevents it from ever looping or calling it twice.
           ...( !leadCapturedRef.current ? { tools: [{ functionDeclarations: [captureLeadDeclaration] }] } : {} ),
@@ -265,7 +233,7 @@ export default function Chatbot() {
                 <MessageCircle size={20} />
               </div>
               <div>
-                <h3 className="font-bold">Verve Assistant</h3>
+                <h3 className="font-bold">{CLIENT_CONFIG.botName}</h3>
                 <p className="text-xs text-accent-green">Online</p>
               </div>
             </div>
