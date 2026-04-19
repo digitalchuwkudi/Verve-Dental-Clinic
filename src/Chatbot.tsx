@@ -174,11 +174,23 @@ export default function Chatbot() {
       setMessages(prev => [...prev, { role: 'model', content: replyText }]);
       speak(replyText);
     } catch (error: any) {
-      console.error(error);
-      const errorMessage = error?.message || "Unknown error";
+      console.error("AI Error:", error);
+      
+      // Parse the error message so the end-user (client's customer) never sees raw JSON
+      const rawError = typeof error?.message === 'string' ? error.message : JSON.stringify(error) || "Unknown error";
+      let friendlyMessage = "Sorry, I'm having trouble connecting to the network right now. Please try again in a moment.";
+      
+      // Handle Free Tier 429 Quota Exhausted limits smoothly
+      if (rawError.includes("429") || rawError.toLowerCase().includes("quota") || rawError.includes("RESOURCE_EXHAUSTED")) {
+        friendlyMessage = "I am currently receiving a massive volume of messages and need a quick breather! Please wait a moment and try again.";
+      } else if (rawError.includes("API key not valid") || rawError.includes("API_KEY_INVALID")) {
+        // Handle misconfigured API Keys
+        friendlyMessage = "The chat system is currently down for maintenance (API Configuration Error).";
+      }
+
       setMessages(prev => [...prev, { 
         role: 'model', 
-        content: `Sorry, I'm having trouble connecting right now. Reason: ${errorMessage}. If this says 'API key not valid', please double check your Gemini key.` 
+        content: friendlyMessage 
       }]);
     } finally {
       setIsLoading(false);
