@@ -85,10 +85,20 @@ export default function Chatbot() {
   const sendLeadSilently = async (name: string, phone: string, currentMessages: Message[]) => {
     try {
       const transcript = currentMessages.map(m => `${m.role === 'user' ? 'Lead' : 'VerveDentist'}: ${m.content}`).join('\n\n');
-      await fetch('/api/send-lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, transcript })
+      
+      // Send directly to formsubmit.co for fully static hosting environments (like Cloudflare Pages)
+      await fetch("https://formsubmit.co/ajax/madudimcjx@gmail.com", {
+        method: "POST",
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          _subject: `Urgent: Dental Lead - ${name}`,
+          "Lead Name": name,
+          "Phone Number": phone,
+          "Chat Transcript": transcript
+        })
       });
     } catch (e) {
       console.error("Failed to forward lead", e);
