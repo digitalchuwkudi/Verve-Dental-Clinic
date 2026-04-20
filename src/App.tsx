@@ -192,7 +192,7 @@ const Hero = () => {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="text-[56px] sm:text-[60px] md:text-[75px] font-bold font-anton tracking-tight text-[#E6F4F1] mb-6 leading-[1.1] text-center"
             >
-              Professional Dentist in Cotonou
+              Professional Dentist in Norwood, Adelaide
             </motion.h1>
             
             <motion.p 
@@ -218,6 +218,27 @@ const Hero = () => {
               <a href="tel:+2290192206612" className="w-full sm:w-auto bg-white/10 hover:bg-accent-green hover:text-primary hover:-translate-y-1 text-[#E6F4F1] px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 shadow-lg flex items-center justify-center gap-2 backdrop-blur-md border border-white/10 whitespace-nowrap">
                 Call Us Today <PhoneCall size={20} />
               </a>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.35 }}
+              className="mt-8 flex flex-col items-center justify-center"
+            >
+              <button 
+                onClick={() => window.dispatchEvent(new CustomEvent('open-chat'))}
+                className="group relative inline-flex items-center gap-3 px-6 py-3 rounded-full bg-black/40 backdrop-blur-md border border-accent-green/50 text-[#E6F4F1] transition-all hover:bg-black/60 shadow-[0_0_20px_rgba(134,197,42,0.15)] hover:shadow-[0_0_30px_rgba(134,197,42,0.3)] hover:-translate-y-1"
+              >
+                <div className="w-10 h-10 rounded-full bg-accent-green flex items-center justify-center group-hover:scale-110 transition-transform text-[#0A1F1C]">
+                  <MessageCircle size={20} />
+                </div>
+                <div className="flex flex-col items-start text-left">
+                  <span className="font-semibold text-base">Chat with our AI Receptionist</span>
+                  <span className="text-xs text-slate-300 font-poppins">Get immediate answers 24/7 & fast priority follow-ups</span>
+                </div>
+              </button>
             </motion.div>
 
             <motion.div
@@ -685,31 +706,28 @@ const Appointment = () => {
                </div>
                <h3 className="text-3xl font-bold font-anton mb-4 text-center">Schedule Online</h3>
                <p className="text-slate-600 font-poppins mb-8 text-center text-lg">Pick a date and time instantly.</p>
-               <form className="space-y-4 flex-grow flex flex-col" onSubmit={(e) => {
-                 e.preventDefault();
-                 alert("Appointment request submitted successfully!");
-               }}>
+               <form className="space-y-4 flex-grow flex flex-col" action="https://formspree.io/f/mwvaqzqe" method="POST">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Booking Name *</label>
-                    <input type="text" required className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all bg-[#E6F4F1]" placeholder="Jane Smith" />
+                    <input type="text" name="name" required className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all bg-[#E6F4F1]" placeholder="Jane Smith" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Phone *</label>
-                    <input type="tel" required className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all bg-[#E6F4F1]" placeholder="(123) 123-1231" />
+                    <input type="tel" name="phone" required className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all bg-[#E6F4F1]" placeholder="(123) 123-1231" />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1">Date *</label>
-                      <input type="date" required className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all bg-[#E6F4F1]" />
+                      <input type="date" name="date" required className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all bg-[#E6F4F1]" />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1">Time *</label>
-                      <input type="time" required className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all bg-[#E6F4F1]" />
+                      <input type="time" name="time" required className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all bg-[#E6F4F1]" />
                     </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Service *</label>
-                    <select required className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all bg-[#E6F4F1]">
+                    <select name="service" required className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all bg-[#E6F4F1]">
                       <option value="">Select a service</option>
                       <option>General Checkups & Cleaning</option>
                       <option>Teeth Whitening</option>
