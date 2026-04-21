@@ -49,13 +49,13 @@ export default function Chatbot() {
     const hasSeenChat = sessionStorage.getItem('hasSeenChat');
     let timer: number;
     if (!hasSeenChat) {
-      // 4-second delay so they can absorb the hero section first
+      // 5-second delay so they can absorb the hero section first
       timer = window.setTimeout(() => {
         // Only auto-open on larger screens to prevent full-screen mobile takeovers
         if (window.innerWidth > 768) {
           setIsOpen(true);
         }
-      }, 4000);
+      }, 5000);
     }
 
     return () => {
