@@ -210,35 +210,24 @@ const Hero = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="flex flex-col sm:flex-row justify-center gap-4 w-full sm:w-auto"
-            >
-              <a href="#booking" className="w-full sm:w-auto bg-white hover:bg-accent-green hover:text-primary hover:-translate-y-1 text-primary px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 shadow-xl shadow-white/10 hover:shadow-accent-green/20 flex items-center justify-center gap-2 whitespace-nowrap">
-                Book an Appointment <ArrowRight size={20} />
-              </a>
-              <a href="tel:+2290192206612" className="w-full sm:w-auto bg-white/10 hover:bg-accent-green hover:text-primary hover:-translate-y-1 text-[#E6F4F1] px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 shadow-lg flex items-center justify-center gap-2 backdrop-blur-md border border-white/10 whitespace-nowrap">
-                Call Us Today <PhoneCall size={20} />
-              </a>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.35 }}
-              className="mt-8 flex flex-col items-center justify-center"
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto mt-2"
             >
               <button 
                 onClick={() => window.dispatchEvent(new CustomEvent('open-chat'))}
-                className="group relative inline-flex items-center gap-3 px-6 py-3 rounded-full bg-black/40 backdrop-blur-md border border-accent-green/50 text-[#E6F4F1] transition-all hover:bg-black/60 shadow-[0_0_20px_rgba(134,197,42,0.15)] hover:shadow-[0_0_30px_rgba(134,197,42,0.3)] hover:-translate-y-1"
+                className="group relative inline-flex items-center justify-center gap-3 px-6 py-3 rounded-full bg-black/40 backdrop-blur-md border border-accent-green/50 text-[#E6F4F1] transition-all hover:bg-black/60 shadow-[0_0_20px_rgba(134,197,42,0.15)] hover:shadow-[0_0_30px_rgba(134,197,42,0.3)] hover:-translate-y-1 w-full sm:w-auto"
               >
-                <div className="w-10 h-10 rounded-full bg-accent-green flex items-center justify-center group-hover:scale-110 transition-transform text-[#0A1F1C]">
+                <div className="w-10 h-10 rounded-full bg-accent-green flex items-center justify-center group-hover:scale-110 transition-transform text-[#0A1F1C] shrink-0">
                   <MessageCircle size={20} />
                 </div>
                 <div className="flex flex-col items-start text-left">
-                  <span className="font-semibold text-base">Chat with our AI Receptionist</span>
-                  <span className="text-xs text-slate-300 font-poppins">Get immediate answers 24/7 & fast priority follow-ups</span>
+                  <span className="font-semibold text-base leading-tight">Chat with our AI Receptionist</span>
+                  <span className="text-xs text-slate-300 font-poppins mt-0.5">Get immediate answers 24/7 & fast priority follow-ups</span>
                 </div>
               </button>
+
+              <a href="#booking" className="w-full sm:w-auto bg-white hover:bg-accent-green hover:text-primary hover:-translate-y-1 text-primary px-8 py-4 sm:py-0 sm:h-[68px] rounded-full font-semibold text-lg transition-all duration-300 shadow-xl shadow-white/10 hover:shadow-accent-green/20 flex items-center justify-center gap-2 whitespace-nowrap">
+                Book an Appointment <ArrowRight size={20} />
+              </a>
             </motion.div>
 
             <motion.div
