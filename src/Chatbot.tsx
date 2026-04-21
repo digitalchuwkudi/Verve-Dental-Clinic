@@ -267,7 +267,9 @@ export default function Chatbot() {
         className={`group fixed bottom-24 right-8 w-14 h-14 bg-accent-green hover:bg-[#86c52a] text-[#0A1F1C] rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-105 z-50 ${isOpen ? 'hidden' : 'flex'}`}
         aria-label="Open Chat"
       >
-        <MessageCircle size={28} />
+        {/* Pulsing ring animation behind the button */}
+        <span className="absolute inset-0 rounded-full border-2 border-accent-green animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite] opacity-50 block w-full h-full"></span>
+        <MessageCircle size={28} className="relative z-10" />
         <span className="absolute right-full mr-4 top-1/2 -translate-y-1/2 px-4 py-2 bg-[#0A1F1C] text-[#E6F4F1] font-poppins font-medium text-sm whitespace-nowrap rounded-xl opacity-0 hover:hidden group-hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-xl border border-white/10 after:content-[''] after:absolute after:top-1/2 after:left-full after:-translate-y-1/2 after:border-[6px] after:border-transparent after:border-l-[#0A1F1C]">
           Click if you need help
         </span>
