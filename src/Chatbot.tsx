@@ -46,29 +46,19 @@ export default function Chatbot() {
     window.addEventListener('open-chat', handleOpenChat);
 
     // Auto-open logic to maximize conversions
-    const hasSeenChat = sessionStorage.getItem('hasSeenChat');
-    let timer: number;
-    if (!hasSeenChat) {
-      // 5-second delay so they can absorb the hero section first
-      timer = window.setTimeout(() => {
-        // Only auto-open on larger screens to prevent full-screen mobile takeovers
-        if (window.innerWidth > 768) {
-          setIsOpen(true);
-        }
-      }, 5000);
-    }
+    // 5-second delay so they can absorb the hero section first
+    const timer = window.setTimeout(() => {
+      // Only auto-open on larger screens to prevent full-screen mobile takeovers
+      if (window.innerWidth > 768) {
+        setIsOpen(true);
+      }
+    }, 5000);
 
     return () => {
       window.removeEventListener('open-chat', handleOpenChat);
-      if (timer) clearTimeout(timer);
+      clearTimeout(timer);
     };
   }, []);
-
-  useEffect(() => {
-    if (isOpen) {
-      sessionStorage.setItem('hasSeenChat', 'true');
-    }
-  }, [isOpen]);
 
   useEffect(() => {
     messagesRef.current = messages;
