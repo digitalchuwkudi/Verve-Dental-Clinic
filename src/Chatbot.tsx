@@ -1,30 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Mic, Volume2, VolumeX, Loader2, MessageSquareShare } from 'lucide-react';
-import { GoogleGenAI, Type, FunctionDeclaration } from '@google/genai';
-import { CLIENT_CONFIG, getSystemPrompt, getPostCapturePrompt } from './clientConfig';
+import { CLIENT_CONFIG } from './clientConfig';
 
 interface Message {
   role: 'user' | 'model';
   content: string;
-}
-
-const captureLeadDeclaration: FunctionDeclaration = {
-  name: "capture_lead",
-  description: "Call this tool once the user has provided their name and phone number.",
-  parameters: {
-    type: Type.OBJECT,
-    properties: {
-      name: { type: Type.STRING, description: "The full name of the lead" },
-      phone: { type: Type.STRING, description: "The phone number of the lead" }
-    },
-    required: ["name", "phone"]
-  }
-};
-
-const apiKey = process.env.GEMINI_API_KEY;
-let aiClient: GoogleGenAI | null = null;
-if (apiKey) {
-  aiClient = new GoogleGenAI({ apiKey });
 }
 
 export default function Chatbot() {
@@ -132,14 +112,7 @@ export default function Chatbot() {
   const handleSend = async (text: string) => {
     if (!text.trim()) return;
 
-    if (!aiClient) {
-      setMessages(prev => [...prev, { role: 'model', content: "Sorry, I am currently disconnected. Please make sure your Gemini API key is securely configured in your AI Studio Secrets panel." }]);
-      return;
-    }
-
     const userMessage: Message = { role: 'user', content: text };
-    // Use messagesRef to guarantee we always have the latest chat history, 
-    // even when triggered asynchronously by the voice API's onend event
     const currentMessages = messagesRef.current;
     const newMessages = [...currentMessages, userMessage];
     
@@ -148,40 +121,34 @@ export default function Chatbot() {
     setIsLoading(true);
 
     try {
-      const contents = newMessages.map(m => ({
-        role: m.role,
-        parts: [{ text: m.content }]
-      }));
-
-      const response = await aiClient.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: contents,
-        config: {
-          systemInstruction: leadCapturedRef.current ? getPostCapturePrompt() : getSystemPrompt(),
-          // Hide the tool from Gemini once we've successfully captured the lead
-          // This prevents it from ever looping or calling it twice.
-          ...( !leadCapturedRef.current ? { tools: [{ functionDeclarations: [captureLeadDeclaration] }] } : {} ),
-          toolConfig: { includeServerSideToolInvocations: true }
-        }
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          messages: newMessages,
+          leadCaptured: leadCapturedRef.current
+        })
       });
 
-      let replyText = response.text || "";
+      if (!response.ok) {
+        throw new Error(`Server responded with ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      let replyText = data.text || "";
       
       // Check for function call
-      if (response.functionCalls && response.functionCalls.length > 0) {
-         const call = response.functionCalls.find(fc => fc.name === "capture_lead");
+      if (data.functionCall) {
+         const call = data.functionCall;
          
-         if (call && call.args && !leadCaptured) {
+         if (call.name === "capture_lead" && call.args && !leadCaptured) {
             setLeadCaptured(true);
             const argMap = call.args as Record<string, any>;
             sendLeadSilently(argMap.name || "Unknown", argMap.phone || "Unknown", newMessages);
          }
-
-         if (!replyText) {
-             replyText = "Thank you so much! Our team has received your details and will be in touch with you shortly. Is there anything else I can help you with today?";
-         }
-      } else if (!replyText) {
-          replyText = "I'm sorry, I couldn't process that.";
       }
 
       setMessages(prev => [...prev, { role: 'model', content: replyText }]);
@@ -189,17 +156,7 @@ export default function Chatbot() {
     } catch (error: any) {
       console.error("AI Error:", error);
       
-      // Parse the error message so the end-user (client's customer) never sees raw JSON
-      const rawError = typeof error?.message === 'string' ? error.message : JSON.stringify(error) || "Unknown error";
       let friendlyMessage = "Sorry, I'm having trouble connecting to the network right now. Please try again in a moment.";
-      
-      // Handle Free Tier 429 Quota Exhausted limits smoothly
-      if (rawError.includes("429") || rawError.toLowerCase().includes("quota") || rawError.includes("RESOURCE_EXHAUSTED")) {
-        friendlyMessage = "I am currently receiving a massive volume of messages and need a quick breather! Please wait a moment and try again.";
-      } else if (rawError.includes("API key not valid") || rawError.includes("API_KEY_INVALID")) {
-        // Handle misconfigured API Keys
-        friendlyMessage = "The chat system is currently down for maintenance (API Configuration Error).";
-      }
 
       setMessages(prev => [...prev, { 
         role: 'model', 
