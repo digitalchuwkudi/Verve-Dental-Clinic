@@ -902,15 +902,15 @@ const Footer = () => {
             </div>
           </div>
           
-          {/* AI Assistant CTA */}
+          {/* AI Receptionist CTA */}
           <div className="mt-16 flex flex-col items-center text-center space-y-4">
-            <p className="text-slate-400 text-lg font-poppins mb-2">Want answers immediately without waiting? Talk to our intelligent assistant.</p>
+            <p className="text-slate-400 text-lg font-poppins mb-2">Want answers immediately without waiting? Talk to our intelligent receptionist.</p>
             <button 
               onClick={() => window.dispatchEvent(new Event('open-chat'))}
               className="group bg-accent-green text-[#0A1F1C] px-8 py-4 rounded-full font-bold text-[18px] hover:bg-[#86c52a] hover:-translate-y-1 transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-accent-green/20"
             >
               <MessageCircle size={24} className="group-hover:scale-110 transition-transform" />
-              Chat with AI Assistant Now
+              Chat with AI Receptionist Now
             </button>
           </div>
         </div>

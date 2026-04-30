@@ -3,14 +3,15 @@ import { getSystemPrompt, getPostCapturePrompt } from '../../src/clientConfig';
 
 const captureLeadDeclaration: FunctionDeclaration = {
   name: "capture_lead",
-  description: "Call this tool once the user has provided their name and phone number.",
+  description: "Call this tool once the user has provided their name and AT LEAST ONE contact method (phone or email).",
   parameters: {
     type: Type.OBJECT,
     properties: {
       name: { type: Type.STRING, description: "The full name of the lead" },
-      phone: { type: Type.STRING, description: "The phone number of the lead" }
+      phone: { type: Type.STRING, description: "The phone number of the lead" },
+      email: { type: Type.STRING, description: "The email address of the lead" }
     },
-    required: ["name", "phone"]
+    required: ["name"]
   }
 };
 

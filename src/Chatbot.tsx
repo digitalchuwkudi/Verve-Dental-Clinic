@@ -48,7 +48,7 @@ export default function Chatbot() {
     leadCapturedRef.current = leadCaptured;
   }, [leadCaptured]);
 
-  const sendLeadSilently = async (name: string, phone: string, currentMessages: Message[]) => {
+  const sendLeadSilently = async (name: string, phone: string, email: string, currentMessages: Message[]) => {
     try {
       const transcript = currentMessages.map(m => `${m.role === 'user' ? 'Lead' : CLIENT_CONFIG.companyName}: ${m.content}`).join('\n\n');
       
@@ -63,6 +63,7 @@ export default function Chatbot() {
           _subject: `Urgent: New Lead - ${name}`,
           "Lead Name": name,
           "Phone Number": phone,
+          "Email Address": email || "Not provided",
           "Chat Transcript": transcript
         })
       });
@@ -133,7 +134,11 @@ export default function Chatbot() {
       });
 
       if (!response.ok) {
-        throw new Error(`Server responded with ${response.status}`);
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch (e) {}
+        throw new Error(errorData?.error || `Server responded with ${response.status}`);
       }
 
       const data = await response.json();
@@ -147,7 +152,7 @@ export default function Chatbot() {
          if (call.name === "capture_lead" && call.args && !leadCaptured) {
             setLeadCaptured(true);
             const argMap = call.args as Record<string, any>;
-            sendLeadSilently(argMap.name || "Unknown", argMap.phone || "Unknown", newMessages);
+            sendLeadSilently(argMap.name || "Unknown", argMap.phone || "Unknown", argMap.email || "", newMessages);
          }
       }
 
@@ -156,7 +161,14 @@ export default function Chatbot() {
     } catch (error: any) {
       console.error("AI Error:", error);
       
+      const rawError = typeof error?.message === 'string' ? error.message : "Unknown error";
       let friendlyMessage = "Sorry, I'm having trouble connecting to the network right now. Please try again in a moment.";
+      
+      if (rawError.includes("429") || rawError.toLowerCase().includes("quota") || rawError.includes("RESOURCE_EXHAUSTED")) {
+        friendlyMessage = "I am currently receiving a massive volume of messages and need a quick breather! Please wait a moment and try again.";
+      } else if (rawError.toLowerCase().includes("api key not valid") || rawError.includes("API_KEY_INVALID")) {
+        friendlyMessage = "The chat system is currently down for maintenance (API Configuration Error).";
+      }
 
       setMessages(prev => [...prev, { 
         role: 'model', 
@@ -221,7 +233,7 @@ export default function Chatbot() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className={`group fixed bottom-24 right-8 w-14 h-14 bg-accent-green hover:bg-[#86c52a] text-[#0A1F1C] rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-105 z-50 ${isOpen ? 'hidden' : 'flex'}`}
+        className={`group fixed bottom-6 sm:bottom-10 right-4 sm:right-8 w-14 h-14 bg-accent-green hover:bg-[#86c52a] text-[#0A1F1C] rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-105 z-[60] ${isOpen ? 'hidden' : 'flex'}`}
         aria-label="Open Chat"
       >
         {/* Pulsing ring animation behind the button */}
@@ -233,7 +245,7 @@ export default function Chatbot() {
       </button>
 
       {isOpen && (
-        <div className="fixed bottom-24 right-8 w-[90vw] sm:w-[380px] h-[550px] max-h-[85vh] bg-white rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden border border-slate-200">
+        <div className="fixed bottom-6 sm:bottom-10 right-4 sm:right-8 w-[calc(100vw-32px)] sm:w-[380px] h-[480px] max-h-[calc(100dvh-100px)] bg-white rounded-2xl shadow-2xl flex flex-col z-[60] overflow-hidden border border-slate-200">
           <div className="bg-[#0A1F1C] p-4 flex items-center justify-between text-[#E6F4F1]">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-accent-green rounded-full flex items-center justify-center text-[#0A1F1C]">

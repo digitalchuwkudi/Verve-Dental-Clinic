@@ -7,14 +7,15 @@ import { getSystemPrompt, getPostCapturePrompt } from './src/clientConfig';
 
 const captureLeadDeclaration: FunctionDeclaration = {
   name: "capture_lead",
-  description: "Call this tool once the user has provided their name and phone number.",
+  description: "Call this tool once the user has provided their name and AT LEAST ONE contact method (phone or email).",
   parameters: {
     type: Type.OBJECT,
     properties: {
       name: { type: Type.STRING, description: "The full name of the lead" },
-      phone: { type: Type.STRING, description: "The phone number of the lead" }
+      phone: { type: Type.STRING, description: "The phone number of the lead" },
+      email: { type: Type.STRING, description: "The email address of the lead" }
     },
-    required: ["name", "phone"]
+    required: ["name"]
   }
 };
 
@@ -80,13 +81,14 @@ async function startServer() {
   // API Route to forward lead emails
   app.post("/api/send-lead", async (req, res) => {
     try {
-      const { name, phone, transcript } = req.body;
+      const { name, phone, email, transcript } = req.body;
       
       const emailContent = `
-NEW LEAD CAPTURED FROM VERVEDENTIST AI ASSISTANT
+NEW LEAD CAPTURED FROM VERVEDENTIST AI RECEPTIONIST
 
 Lead Name: ${name}
-Lead Phone: ${phone}
+Lead Phone: ${phone || 'Not provided'}
+Lead Email: ${email || 'Not provided'}
 
 --- CHAT TRANSCRIPT ---
 ${transcript}
@@ -106,6 +108,7 @@ ${transcript}
           _subject: `Urgent: Dental Lead - ${name}`,
           "Lead Name": name,
           "Phone Number": phone,
+          "Email Address": email,
           "Chat Transcript": transcript
         })
       });
