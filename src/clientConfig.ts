@@ -2,9 +2,9 @@ export const CLIENT_CONFIG = {
   // ==========================================
   // 1. BRANDING & UI SETTINGS
   // ==========================================
-  companyName: "VerveDentist",
-  botName: "VerveDentist Receptionist",
-  greetingMessage: "Hello! How are you today? I'm the VerveDentist receptionist. How can I help you today?",
+  companyName: "Verve Dental",
+  botName: "Verve Dental Receptionist",
+  greetingMessage: "Hello! How are you today? I'm the Verve Dental receptionist. How can I help you today?",
 
   // ==========================================
   // 2. LEAD ROUTING (FormSubmit endpoint)

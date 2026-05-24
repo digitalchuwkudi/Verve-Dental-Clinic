@@ -62,7 +62,7 @@ const Navbar = () => {
     const handleScroll = () => {
       if (timeoutId === null) {
         timeoutId = window.setTimeout(() => {
-          setIsScrolled(window.scrollY > 300);
+          setIsScrolled(window.scrollY > window.innerHeight * 0.6);
           timeoutId = null;
         }, 50);
       }
@@ -77,36 +77,40 @@ const Navbar = () => {
   return (
     <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-[#E6F4F1]/95 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center relative">
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-[#E6F4F1]">
               <Smile size={24} />
             </div>
             <span className={`font-heading font-bold text-2xl tracking-tight ${isScrolled ? 'text-[#0A1F1C]' : 'text-[#E6F4F1]'}`}>
-              VerveDentist
+              Verve Dental
             </span>
           </div>
           
           {/* Desktop Menu */}
-          <div className="hidden lg:flex items-center space-x-4 lg:space-x-8">
+          <div className="hidden lg:flex items-center space-x-4 lg:space-x-8 absolute left-1/2 -translate-x-1/2">
             <a href="#home" className={`text-sm lg:text-base font-medium hover:text-accent-green transition-colors ${isScrolled ? 'text-[#0A1F1C]' : 'text-[#E6F4F1]'}`}>Home</a>
             <a href="#about" className={`text-sm lg:text-base font-medium hover:text-accent-green transition-colors ${isScrolled ? 'text-[#0A1F1C]' : 'text-[#E6F4F1]'}`}>About Us</a>
             <a href="#services" className={`text-sm lg:text-base font-medium hover:text-accent-green transition-colors ${isScrolled ? 'text-[#0A1F1C]' : 'text-[#E6F4F1]'}`}>Services</a>
             <a href="#results" className={`text-sm lg:text-base font-medium hover:text-accent-green transition-colors ${isScrolled ? 'text-[#0A1F1C]' : 'text-[#E6F4F1]'}`}>Results</a>
             <a href="#testimonials" className={`text-sm lg:text-base font-medium hover:text-accent-green transition-colors ${isScrolled ? 'text-[#0A1F1C]' : 'text-[#E6F4F1]'}`}>Reviews</a>
             <a href="#contact" className={`text-sm lg:text-base font-medium hover:text-accent-green transition-colors ${isScrolled ? 'text-[#0A1F1C]' : 'text-[#E6F4F1]'}`}>Contact Us</a>
-            <a href="tel:+2290192206612" className={`text-base lg:text-lg font-bold hover:text-accent-green transition-colors flex items-center gap-2 whitespace-nowrap ${isScrolled ? 'text-[#0A1F1C]' : 'text-[#E6F4F1]'}`}>
-              <Phone size={20} /> +229 01 92 20 66 12
-            </a>
           </div>
 
-          {/* Mobile Menu Button */}
-          <button 
-            className={`lg:hidden p-2 rounded-lg backdrop-blur-sm ${isScrolled ? 'text-[#0A1F1C] bg-[#E6F4F1]' : 'text-[#E6F4F1] bg-white/20'}`}
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          <div className="flex items-center gap-4">
+            {/* Desktop Contact */}
+            <a href="tel:+2290192206612" className={`hidden lg:flex text-base lg:text-lg font-bold hover:text-accent-green transition-colors items-center gap-2 whitespace-nowrap ${isScrolled ? 'text-[#0A1F1C]' : 'text-[#E6F4F1]'}`}>
+              <Phone size={20} /> +229 01 92 20 66 12
+            </a>
+            
+            {/* Mobile Menu Button */}
+            <button 
+              className={`lg:hidden p-2 rounded-lg backdrop-blur-sm ${isScrolled ? 'text-[#0A1F1C] bg-[#E6F4F1]' : 'text-[#E6F4F1] bg-white/20'}`}
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -140,11 +144,11 @@ const Navbar = () => {
 const Hero = () => {
   return (
     <>
-      <section id="home" className="relative h-[100svh] md:h-[65vh] lg:h-[95vh] xl:h-screen overflow-hidden bg-black">
+      <section id="home" className="relative h-[120vh] overflow-hidden bg-black">
         {/* Background Video */}
         <div className="absolute inset-0 z-0">
           <video 
-            src="https://res.cloudinary.com/dx41voszq/video/upload/q_auto,f_auto,w_1280/v1775748213/Dental_website_au1wod.mp4" 
+            src="https://res.cloudinary.com/dx41voszq/video/upload/v1775748213/Dental_website_au1wod.mp4" 
             autoPlay 
             loop 
             muted 
@@ -797,7 +801,7 @@ const Appointment = () => {
 
 const FAQ = () => {
   const faqs = [
-    { q: "What services does VerveDentist offer?", a: "We offer a comprehensive range of dental services including general checkups, teeth whitening, implants, orthodontics, and cosmetic dentistry." },
+    { q: "What services does Verve Dental offer?", a: "We offer a comprehensive range of dental services including general checkups, teeth whitening, implants, orthodontics, and cosmetic dentistry." },
     { q: "How often should I visit the dentist?", a: "We recommend visiting the dentist every six months for a routine checkup and professional cleaning." },
     { q: "Do dental treatments hurt?", a: "We prioritize your comfort. With modern techniques and anesthetics, most treatments are virtually pain-free." },
     { q: "How do I know which treatment is right for me?", a: "During your initial consultation, our experts will evaluate your oral health and discuss your goals to recommend a personalized treatment plan." },
@@ -960,7 +964,7 @@ const Footer = () => {
             Verve
           </h1>
           <p className="text-[#E6F4F1] text-sm mt-8 text-center">
-            &copy; {new Date().getFullYear()} VerveDentist Clinic. All rights reserved.
+            &copy; {new Date().getFullYear()} Verve Dental Clinic. All rights reserved.
           </p>
           <p className="text-accent-green text-sm mt-2 text-center font-medium">
             Cooked by Digital Chukwudi

@@ -20,23 +20,47 @@ export default function Chatbot() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef(messages);
   const leadCapturedRef = useRef(leadCaptured);
+  const hasAutoOpened = useRef(false);
 
   useEffect(() => {
     const handleOpenChat = () => setIsOpen(true);
     window.addEventListener('open-chat', handleOpenChat);
 
+    let timer: number;
+    let observer: IntersectionObserver;
+
     // Auto-open logic to maximize conversions
-    // 5-second delay so they can absorb the hero section first
-    const timer = window.setTimeout(() => {
-      // Only auto-open on larger screens to prevent full-screen mobile takeovers
-      if (window.innerWidth > 768) {
-        setIsOpen(true);
+    if (window.innerWidth > 768) {
+      // Desktop: 5-second delay so they can absorb the hero section first
+      timer = window.setTimeout(() => {
+        if (!hasAutoOpened.current) {
+          setIsOpen(true);
+          hasAutoOpened.current = true;
+        }
+      }, 5000);
+    } else {
+      // Mobile/Tablet: Open when about to scroll to 'about us' section
+      observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && !hasAutoOpened.current) {
+            setIsOpen(true);
+            hasAutoOpened.current = true;
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.1, rootMargin: '100px' } 
+      );
+      
+      const aboutSection = document.getElementById('about');
+      if (aboutSection) {
+        observer.observe(aboutSection);
       }
-    }, 5000);
+    }
 
     return () => {
       window.removeEventListener('open-chat', handleOpenChat);
-      clearTimeout(timer);
+      if (timer) clearTimeout(timer);
+      if (observer) observer.disconnect();
     };
   }, []);
 
