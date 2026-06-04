@@ -101,23 +101,19 @@ Interest/Context: ${treatmentInterest || 'General'}
 ${transcript}
       `.trim();
 
-      // We use formsubmit.co's free API to route the email silently. 
-      // This sends a real email to madudimcjx@gmail.com without needing an SMTP configuration.
-      const response = await fetch("https://formsubmit.co/ajax/madudimcjx@gmail.com", {
+      // We use Resend API to route the email
+      const resendApiKey = process.env.RESEND_API_KEY || "re_HL52B9pZ_NPLKFPJi9R29vEWHwwNFt4n9";
+      const response = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Origin': 'https://vervedentist-ai.com',
-          'Referer': 'https://vervedentist-ai.com/'
+          'Authorization': `Bearer ${resendApiKey}`,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          _subject: subject,
-          "Lead Name": name,
-          "Phone Number": phone,
-          "Email Address": email,
-          "Interest": treatmentInterest || "General",
-          "Chat Transcript": transcript
+          from: "Verve Dental <onboarding@resend.dev>",
+          to: "madudimcjx@gmail.com",
+          subject: subject,
+          text: emailContent
         })
       });
 
@@ -128,6 +124,45 @@ ${transcript}
       res.json({ success: true, message: "Lead forwarded successfully." });
     } catch (error) {
       console.error("Error sending lead:", error);
+      res.status(500).json({ success: false, error: "Internal Server Error" });
+    }
+  });
+
+  // API Route to forward regular form submissions
+  app.post("/api/schedule", async (req, res) => {
+    try {
+      const { name, date, time } = req.body;
+      const resendApiKey = process.env.RESEND_API_KEY || "re_HL52B9pZ_NPLKFPJi9R29vEWHwwNFt4n9";
+      
+      const emailContent = `
+NEW BOOKING REQUEST FROM VERVE DENTAL WEBSITE
+
+Name: ${name}
+Requested Date: ${date}
+Requested Time: ${time}
+      `.trim();
+
+      const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { 
+          'Authorization': `Bearer ${resendApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: "Verve Dental <onboarding@resend.dev>",
+          to: "madudimcjx@gmail.com",
+          subject: `New Booking Request from ${name}`,
+          text: emailContent
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to forward booking request via Resend.");
+      }
+
+      res.status(200).json({ success: true, message: "Booking requested successfully." });
+    } catch (error) {
+      console.error("Error sending booking email:", error);
       res.status(500).json({ success: false, error: "Internal Server Error" });
     }
   });
