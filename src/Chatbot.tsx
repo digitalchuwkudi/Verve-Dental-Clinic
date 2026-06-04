@@ -226,6 +226,9 @@ ${transcript}
             setLeadCaptured(true);
             const argMap = call.args as Record<string, any>;
             sendLeadSilently(argMap.name || "Unknown", argMap.phone || "", argMap.email || "", argMap.treatmentInterest || "General", newMessages);
+         } else if (call.name === "update_lead" && call.args && leadCaptured) {
+            const argMap = call.args as Record<string, any>;
+            sendLeadSilently(argMap.name || "Unknown Lead", argMap.phone || "", argMap.email || "", argMap.treatmentInterest || "Additional Info Provided", newMessages);
          }
       }
 

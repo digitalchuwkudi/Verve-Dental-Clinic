@@ -16,6 +16,21 @@ const captureLeadDeclaration: FunctionDeclaration = {
   }
 };
 
+const updateLeadDeclaration: FunctionDeclaration = {
+  name: "update_lead",
+  description: "Call this tool to update the lead with new info if the user provides additional contact details (like an email or phone) or additional treatment context after the initial capture.",
+  parameters: {
+    type: Type.OBJECT,
+    properties: {
+      name: { type: Type.STRING, description: "The exact same full name of the lead requested previously" },
+      phone: { type: Type.STRING, description: "The phone number of the lead, if provided" },
+      email: { type: Type.STRING, description: "The email address of the lead, if provided" },
+      treatmentInterest: { type: Type.STRING, description: "The new or updated treatment interest or context" }
+    },
+    required: ["name"]
+  }
+};
+
 export const onRequestPost = async (context: any) => {
   try {
     const { request, env } = context;
@@ -43,7 +58,7 @@ export const onRequestPost = async (context: any) => {
       contents: contents,
       config: {
         systemInstruction: leadCaptured ? getPostCapturePrompt() : getSystemPrompt(),
-        ...( !leadCaptured ? { tools: [{ functionDeclarations: [captureLeadDeclaration] }] } : {} ),
+        tools: [{ functionDeclarations: leadCaptured ? [updateLeadDeclaration] : [captureLeadDeclaration] }],
         toolConfig: { includeServerSideToolInvocations: true }
       }
     });
@@ -52,7 +67,7 @@ export const onRequestPost = async (context: any) => {
     let functionCall = null;
 
     if (response.functionCalls && response.functionCalls.length > 0) {
-      const call = response.functionCalls.find(fc => fc.name === "capture_lead");
+      const call = response.functionCalls.find(fc => fc.name === "capture_lead" || fc.name === "update_lead");
       if (call) {
         functionCall = {
           name: call.name,
@@ -60,7 +75,9 @@ export const onRequestPost = async (context: any) => {
         };
       }
       if (!replyText) {
-        replyText = "Thank you so much! Our team has received your details and will be in touch with you shortly. Is there anything else I can help you with today?";
+        replyText = call?.name === "capture_lead" 
+          ? "Thank you so much! Our team has received your details and will be in touch with you shortly. Is there anything else I can help you with today?"
+          : "Got it! I've updated your clinic file with this new information. Anything else you need attached to your details?";
       }
     } else if (!replyText) {
       replyText = "I'm sorry, I couldn't process that.";
