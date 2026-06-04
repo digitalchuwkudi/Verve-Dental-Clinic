@@ -30,9 +30,13 @@ export default function Chatbot() {
   const [leadCaptured, setLeadCaptured] = useState(() => {
     return localStorage.getItem('verve_lead_captured') === 'true';
   });
+  const [leadNameState, setLeadNameState] = useState(() => {
+    return localStorage.getItem('verve_lead_name') || "";
+  });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef(messages);
   const leadCapturedRef = useRef(leadCaptured);
+  const leadNameRef = useRef(leadNameState);
   const hasAutoOpened = useRef(false);
 
   useEffect(() => {
@@ -44,6 +48,11 @@ export default function Chatbot() {
     localStorage.setItem('verve_lead_captured', leadCaptured ? 'true' : 'false');
     leadCapturedRef.current = leadCaptured;
   }, [leadCaptured]);
+
+  useEffect(() => {
+    localStorage.setItem('verve_lead_name', leadNameState);
+    leadNameRef.current = leadNameState;
+  }, [leadNameState]);
 
   useEffect(() => {
     const handleOpenChat = () => setIsOpen(true);
@@ -103,12 +112,12 @@ export default function Chatbot() {
     };
   }, []);
 
-  const sendLeadSilently = async (name: string, phone: string, email: string, treatmentInterest: string, currentMessages: Message[]) => {
+  const sendLeadSilently = async (name: string, phone: string, email: string, treatmentInterest: string, currentMessages: Message[], isUpdate: boolean = false) => {
     try {
       const transcript = currentMessages.map(m => `${m.role === 'user' ? 'Lead' : CLIENT_CONFIG.companyName}: ${m.content}`).join('\n\n');
       
       const emailContent = `
-NEW AI CHAT LEAD CAPTURE
+${isUpdate ? 'UPDATE TO EXISTING LEAD' : 'NEW AI CHAT LEAD CAPTURE'}
 
 Lead Name: ${name}
 Lead Phone: ${phone || 'Not provided'}
@@ -225,10 +234,13 @@ ${transcript}
          if (call.name === "capture_lead" && call.args && !leadCaptured) {
             setLeadCaptured(true);
             const argMap = call.args as Record<string, any>;
-            sendLeadSilently(argMap.name || "Unknown", argMap.phone || "", argMap.email || "", argMap.treatmentInterest || "General", newMessages);
+            const finalName = argMap.name || "Unknown";
+            setLeadNameState(finalName);
+            sendLeadSilently(finalName, argMap.phone || "", argMap.email || "", argMap.treatmentInterest || "General", newMessages);
          } else if (call.name === "update_lead" && call.args && leadCaptured) {
             const argMap = call.args as Record<string, any>;
-            sendLeadSilently(argMap.name || "Unknown Lead", argMap.phone || "", argMap.email || "", argMap.treatmentInterest || "Additional Info Provided", newMessages);
+            const finalName = argMap.name || leadNameRef.current || "Unknown Lead";
+            sendLeadSilently(finalName, argMap.phone || "", argMap.email || "", argMap.treatmentInterest || "Additional Info Provided", newMessages, true);
          }
       }
 
