@@ -1,5 +1,10 @@
 {
   "name": "Dental Clinic",
   "description": "A modern, high-converting landing page for a dental clinic featuring services, testimonials, and appointment booking.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
