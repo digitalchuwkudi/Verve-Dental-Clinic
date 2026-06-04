@@ -107,6 +107,18 @@ export default function Chatbot() {
     try {
       const transcript = currentMessages.map(m => `${m.role === 'user' ? 'Lead' : CLIENT_CONFIG.companyName}: ${m.content}`).join('\n\n');
       
+      const emailContent = `
+NEW AI CHAT LEAD CAPTURE
+
+Lead Name: ${name}
+Lead Phone: ${phone || 'Not provided'}
+Lead Email: ${email || 'Not provided'}
+Interest/Context: ${treatmentInterest || 'General'}
+
+--- CHAT TRANSCRIPT ---
+${transcript}
+      `.trim();
+
       await fetch('/api/send-lead', {
         method: "POST",
         headers: { 
@@ -120,6 +132,7 @@ export default function Chatbot() {
           transcript
         })
       });
+
     } catch (e) {
       console.error("Failed to forward lead", e);
     }

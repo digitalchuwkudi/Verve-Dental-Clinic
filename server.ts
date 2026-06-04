@@ -107,9 +107,7 @@ ${transcript}
         method: "POST",
         headers: { 
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Origin': 'https://ais-dev-zwanz2q3xqa5npwrdu7niv-725612077637.europe-west2.run.app',
-          'Referer': 'https://ais-dev-zwanz2q3xqa5npwrdu7niv-725612077637.europe-west2.run.app/'
+          'Accept': 'application/json'
         },
         body: JSON.stringify({
           _subject: subject,

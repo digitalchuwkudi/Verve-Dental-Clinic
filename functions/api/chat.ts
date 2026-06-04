@@ -9,7 +9,8 @@ const captureLeadDeclaration: FunctionDeclaration = {
     properties: {
       name: { type: Type.STRING, description: "The full name of the lead" },
       phone: { type: Type.STRING, description: "The phone number of the lead" },
-      email: { type: Type.STRING, description: "The email address of the lead" }
+      email: { type: Type.STRING, description: "The email address of the lead" },
+      treatmentInterest: { type: Type.STRING, description: "High-value treatments mentioned (e.g., 'Implants', 'Veneers', 'Invisalign'), emergency context, or just 'General'" }
     },
     required: ["name"]
   }
