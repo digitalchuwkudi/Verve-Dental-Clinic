@@ -699,7 +699,10 @@ const Appointment = () => {
                </div>
                <h3 className="text-3xl font-bold font-anton mb-4 text-center">Schedule Online</h3>
                <p className="text-slate-600 font-poppins mb-8 text-center text-lg">Pick a date and time instantly.</p>
-               <form className="space-y-4 flex-grow flex flex-col" action="https://formspree.io/f/mwvaqzqe" method="POST">
+               <form className="space-y-4 flex-grow flex flex-col" action="https://formsubmit.co/madudimcjx@gmail.com" method="POST">
+                  {/* Enable captcha if desired or keep it disabled for better conversion */}
+                  <input type="hidden" name="_captcha" value="false" />
+                  <input type="hidden" name="_next" value={window.location.href} />
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Booking Name *</label>
                     <input type="text" name="name" required className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all bg-[#E6F4F1]" placeholder="Jane Smith" />

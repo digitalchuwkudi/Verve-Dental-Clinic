@@ -101,13 +101,15 @@ Interest/Context: ${treatmentInterest || 'General'}
 ${transcript}
       `.trim();
 
-      // We use FormSubmit's free API to route the email silently. 
+      // We use FormSubmit's free API to route the email.
       // NOTE: madudimcjx@gmail.com MUST click "Activate" in the verification email FormSubmit sends on the first test.
       const response = await fetch("https://formsubmit.co/ajax/madudimcjx@gmail.com", {
         method: "POST",
         headers: { 
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          'Origin': 'https://ais-dev-zwanz2q3xqa5npwrdu7niv-725612077637.europe-west2.run.app',
+          'Referer': 'https://ais-dev-zwanz2q3xqa5npwrdu7niv-725612077637.europe-west2.run.app/'
         },
         body: JSON.stringify({
           _subject: subject,
