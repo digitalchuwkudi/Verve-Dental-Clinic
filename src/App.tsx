@@ -99,8 +99,8 @@ const Navbar = () => {
 
           <div className="flex items-center gap-4">
             {/* Desktop Contact */}
-            <a href="tel:+2290192206612" className={`hidden lg:flex text-base lg:text-lg font-bold hover:text-accent-green transition-colors items-center gap-2 whitespace-nowrap ${isScrolled ? 'text-[#0A1F1C]' : 'text-[#E6F4F1]'}`}>
-              <Phone size={20} /> +229 01 92 20 66 12
+            <a href="tel:+61871234589" className={`hidden lg:flex text-base lg:text-lg font-bold hover:text-accent-green transition-colors items-center gap-2 whitespace-nowrap ${isScrolled ? 'text-[#0A1F1C]' : 'text-[#E6F4F1]'}`}>
+              <Phone size={20} /> +61 8 7123 4589
             </a>
             
             {/* Mobile Menu Button */}
@@ -130,8 +130,8 @@ const Navbar = () => {
               <a href="#results" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-3 text-base font-medium text-[#0A1F1C] hover:text-accent-green rounded-lg">Results</a>
               <a href="#testimonials" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-3 text-base font-medium text-[#0A1F1C] hover:text-accent-green rounded-lg">Reviews</a>
               <a href="#contact" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-3 text-base font-medium text-[#0A1F1C] hover:text-accent-green rounded-lg">Contact Us</a>
-              <a href="tel:+2290192206612" onClick={() => setIsMobileMenuOpen(false)} className="mt-4 w-full bg-primary hover:bg-accent-green hover:text-primary hover:-translate-y-1 transition-all duration-300 text-[#E6F4F1] px-6 py-3 rounded-full text-lg font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/30 hover:shadow-accent-green/20 whitespace-nowrap">
-                <Phone size={20} /> +229 01 92 20 66 12
+              <a href="tel:+61871234589" onClick={() => setIsMobileMenuOpen(false)} className="mt-4 w-full bg-primary hover:bg-accent-green hover:text-primary hover:-translate-y-1 transition-all duration-300 text-[#E6F4F1] px-6 py-3 rounded-full text-lg font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/30 hover:shadow-accent-green/20 whitespace-nowrap">
+                <Phone size={20} /> +61 8 7123 4589
               </a>
             </div>
           </motion.div>
@@ -881,24 +881,24 @@ const Footer = () => {
             <div className="space-y-8">
               <div className="flex items-start gap-4">
                 <div className="w-8 flex justify-center mt-1"><Clock className="text-accent-green shrink-0" size={24} /></div>
-                <p className="text-slate-300 text-[18px] font-normal font-poppins">Monday - Sunday (5am - 6pm)</p>
+                <p className="text-slate-300 text-[18px] font-normal font-poppins">Monday - Saturday (8am - 6pm)</p>
               </div>
               <div className="flex items-start gap-4 text-slate-300">
                 <div className="w-8 flex justify-center mt-1"><MapPin className="text-accent-green shrink-0" size={24} /></div>
                 <div>
-                  <p className="text-[18px] font-normal font-poppins">123 Medical Plaza, Suite 400</p>
-                  <p className="text-[18px] font-normal font-poppins">New York, NY 10001</p>
+                  <p className="text-[18px] font-normal font-poppins">47 The Parade</p>
+                  <p className="text-[18px] font-normal font-poppins">Norwood SA 5067, Adelaide, Australia</p>
                 </div>
               </div>
             </div>
             <div className="space-y-8">
               <div className="flex items-start gap-4">
                 <div className="w-8 flex justify-center mt-1"><Phone className="text-accent-green shrink-0" size={24} /></div>
-                <a href="tel:+2290192206612" className="text-slate-300 text-[18px] font-normal font-poppins hover:text-accent-green transition-colors">+229 01 92 20 66 12</a>
+                <a href="tel:+61871234589" className="text-slate-300 text-[18px] font-normal font-poppins hover:text-accent-green transition-colors">+61 8 7123 4589</a>
               </div>
               <div className="flex items-start gap-4">
                 <div className="w-8 flex justify-center mt-1"><WhatsAppIcon className="text-accent-green shrink-0" size={24} /></div>
-                <a href="https://wa.me/+2290192206612" target="_blank" rel="noopener noreferrer" className="text-slate-300 text-[18px] font-normal font-poppins hover:text-accent-green transition-colors">+229 01 92 20 66 12</a>
+                <a href="https://wa.me/61871234589" target="_blank" rel="noopener noreferrer" className="text-slate-300 text-[18px] font-normal font-poppins hover:text-accent-green transition-colors">+61 8 7123 4589</a>
               </div>
               <div className="flex items-start gap-4">
                 <div className="w-8 flex justify-center mt-1"><Mail className="text-accent-green shrink-0" size={24} /></div>
@@ -970,7 +970,7 @@ const Footer = () => {
             &copy; {new Date().getFullYear()} Verve Dental Clinic. All rights reserved.
           </p>
           <p className="text-accent-green text-sm mt-2 text-center font-medium">
-            Cooked by Digital Chukwudi
+            Cooked by <a href="https://dentistleads.pages.dev" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">dentistleads</a>
           </p>
         </div>
 

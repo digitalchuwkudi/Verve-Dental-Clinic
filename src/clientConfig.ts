@@ -4,7 +4,7 @@ export const CLIENT_CONFIG = {
   // ==========================================
   companyName: "Verve Dental",
   botName: "Verve Dental Receptionist",
-  greetingMessage: "Hello! How are you today? I'm the Verve Dental receptionist. How can I help you today?",
+  greetingMessage: "Hi! How are you today? I'm the Verve Dental receptionist, Are you looking to book a dental appointment, or do you have questions about a specific treatment?",
 
   // ==========================================
   // 2. LEAD ROUTING (FormSubmit endpoint)
@@ -17,9 +17,9 @@ export const CLIENT_CONFIG = {
   // 3. AI KNOWLEDGE BASE (What the AI knows)
   // ==========================================
   companyEmail: "madudimcjx@gmail.com",
-  companyPhone: "+229 01 92 20 66 12",
-  companyAddress: "123 Medical Plaza, Suite 400, New York, NY 10001",
-  workingHours: "Monday - Sunday (5am - 6pm)",
+  companyPhone: "+61 8 7123 4589",
+  companyAddress: "47 The Parade, Norwood SA 5067, Adelaide, Australia",
+  workingHours: "Monday - Saturday (8am - 6pm)",
   
   services: "General Checkups & Cleaning, Teeth Whitening, Dental Implants, Braces & Orthodontics, Cosmetic Dentistry, Emergency Dental Care (e.g. knocked out tooth).",
   benefits: "Expert Team, Painless Care, Affordable payment plans, Flexible (evening and weekend slots).",

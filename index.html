@@ -5,8 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Verve Dental</title>
+    <style>
+      #root:empty {
+        display: block;
+        min-height: 100vh;
+        background-color: #0A1F1C;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      #root:empty::before {
+        content: "";
+        width: 48px;
+        height: 48px;
+        border: 4px solid rgba(230, 244, 241, 0.3);
+        border-top-color: #4CAF50;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 24px;
+      }
+      #root:empty::after {
+        content: "Loading Verve Dental...";
+        font-family: system-ui, -apple-system, sans-serif;
+        color: #E6F4F1;
+        font-size: 18px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
   </head>
   <body>
+    <noscript>
+      <div style="background-color: #0A1F1C; color: #E6F4F1; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: sans-serif; padding: 2rem; text-align: center;">
+        <div>
+          <h1 style="font-size: 2rem; margin-bottom: 1rem; color: #4CAF50;">Verve Dental</h1>
+          <p>Please enable JavaScript to view this application.</p>
+        </div>
+      </div>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
