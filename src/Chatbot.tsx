@@ -9,18 +9,41 @@ interface Message {
 
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', content: CLIENT_CONFIG.greetingMessage }
-  ]);
+  const [messages, setMessages] = useState<Message[]>(() => {
+    const saved = localStorage.getItem('verve_chat_history');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        // failed to parse
+      }
+    }
+    return [
+      { role: 'model', content: "Your privacy is our priority. This conversation is secure and HIPAA/GDPR compliant." },
+      { role: 'model', content: CLIENT_CONFIG.greetingMessage }
+    ];
+  });
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
-  const [leadCaptured, setLeadCaptured] = useState(false);
+  const [leadCaptured, setLeadCaptured] = useState(() => {
+    return localStorage.getItem('verve_lead_captured') === 'true';
+  });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef(messages);
   const leadCapturedRef = useRef(leadCaptured);
   const hasAutoOpened = useRef(false);
+
+  useEffect(() => {
+    localStorage.setItem('verve_chat_history', JSON.stringify(messages));
+    messagesRef.current = messages;
+  }, [messages]);
+
+  useEffect(() => {
+    localStorage.setItem('verve_lead_captured', leadCaptured ? 'true' : 'false');
+    leadCapturedRef.current = leadCaptured;
+  }, [leadCaptured]);
 
   useEffect(() => {
     const handleOpenChat = () => setIsOpen(true);
@@ -57,38 +80,44 @@ export default function Chatbot() {
       }
     }
 
+    // Exit Intent Detection
+    const handleMouseLeave = (e: MouseEvent) => {
+      if (e.clientY <= 0 && !hasAutoOpened.current) {
+        setIsOpen(true);
+        hasAutoOpened.current = true;
+        if (!leadCapturedRef.current) {
+           setMessages(prev => {
+             if (prev.length > 0 && prev[prev.length - 1].content.includes("Wait!")) return prev;
+             return [...prev, { role: 'model', content: "Wait! Do you have more questions about our treatments and service before you go?" }];
+           });
+        }
+      }
+    };
+    document.addEventListener('mouseleave', handleMouseLeave);
+
     return () => {
       window.removeEventListener('open-chat', handleOpenChat);
       if (timer) clearTimeout(timer);
       if (observer) observer.disconnect();
+      document.removeEventListener('mouseleave', handleMouseLeave);
     };
   }, []);
 
-  useEffect(() => {
-    messagesRef.current = messages;
-  }, [messages]);
-
-  useEffect(() => {
-    leadCapturedRef.current = leadCaptured;
-  }, [leadCaptured]);
-
-  const sendLeadSilently = async (name: string, phone: string, email: string, currentMessages: Message[]) => {
+  const sendLeadSilently = async (name: string, phone: string, email: string, treatmentInterest: string, currentMessages: Message[]) => {
     try {
       const transcript = currentMessages.map(m => `${m.role === 'user' ? 'Lead' : CLIENT_CONFIG.companyName}: ${m.content}`).join('\n\n');
       
-      // Send directly to formsubmit.co for fully static hosting environments (like Cloudflare Pages)
-      await fetch(`https://formsubmit.co/ajax/${CLIENT_CONFIG.notificationEmail}`, {
+      await fetch('/api/send-lead', {
         method: "POST",
         headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          _subject: `Urgent: New Lead - ${name}`,
-          "Lead Name": name,
-          "Phone Number": phone,
-          "Email Address": email || "Not provided",
-          "Chat Transcript": transcript
+          name,
+          phone: phone || "Not provided",
+          email: email || "Not provided",
+          treatmentInterest: treatmentInterest || "General",
+          transcript
         })
       });
     } catch (e) {
@@ -169,6 +198,11 @@ export default function Chatbot() {
       
       let replyText = data.text || "";
       
+      // Simulate Human-like "Typing..." Delay based on word count
+      const wordCount = replyText.split(/\s+/).length;
+      const delayMs = Math.min(Math.max(wordCount * 60, 800), 2500); // Between 0.8s and 2.5s
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+
       // Check for function call
       if (data.functionCall) {
          const call = data.functionCall;
@@ -176,7 +210,7 @@ export default function Chatbot() {
          if (call.name === "capture_lead" && call.args && !leadCaptured) {
             setLeadCaptured(true);
             const argMap = call.args as Record<string, any>;
-            sendLeadSilently(argMap.name || "Unknown", argMap.phone || "Unknown", argMap.email || "", newMessages);
+            sendLeadSilently(argMap.name || "Unknown", argMap.phone || "", argMap.email || "", argMap.treatmentInterest || "General", newMessages);
          }
       }
 
@@ -315,7 +349,11 @@ export default function Chatbot() {
             {isLoading && (
               <div className="flex justify-start">
                 <div className="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm border border-slate-100 text-slate-400">
-                  <Loader2 size={18} className="animate-spin" />
+                  <div className="flex gap-1 items-center px-1 h-5">
+                    <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></div>
+                    <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{animationDelay: "0.15s"}}></div>
+                    <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{animationDelay: "0.3s"}}></div>
+                  </div>
                 </div>
               </div>
             )}

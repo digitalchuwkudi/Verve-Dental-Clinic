@@ -13,7 +13,8 @@ const captureLeadDeclaration: FunctionDeclaration = {
     properties: {
       name: { type: Type.STRING, description: "The full name of the lead" },
       phone: { type: Type.STRING, description: "The phone number of the lead" },
-      email: { type: Type.STRING, description: "The email address of the lead" }
+      email: { type: Type.STRING, description: "The email address of the lead" },
+      treatmentInterest: { type: Type.STRING, description: "High-value treatments mentioned (e.g., 'Implants', 'Veneers', 'Invisalign'), emergency context, or just 'General'" }
     },
     required: ["name"]
   }
@@ -81,14 +82,20 @@ async function startServer() {
   // API Route to forward lead emails
   app.post("/api/send-lead", async (req, res) => {
     try {
-      const { name, phone, email, transcript } = req.body;
+      const { name, phone, email, treatmentInterest, transcript } = req.body;
       
+      const interestTag = treatmentInterest && treatmentInterest.toLowerCase() !== 'general' 
+                          ? `[${treatmentInterest.toUpperCase()}]` 
+                          : '';
+      const subject = `Urgent: Dental Lead ${interestTag} - ${name}`;
+
       const emailContent = `
-NEW LEAD CAPTURED FROM VERVEDENTIST AI RECEPTIONIST
+NEW LEAD CAPTURED FROM VERVE DENTAL AI RECEPTIONIST
 
 Lead Name: ${name}
 Lead Phone: ${phone || 'Not provided'}
 Lead Email: ${email || 'Not provided'}
+Interest/Context: ${treatmentInterest || 'General'}
 
 --- CHAT TRANSCRIPT ---
 ${transcript}
@@ -105,10 +112,11 @@ ${transcript}
           'Referer': 'https://vervedentist-ai.com/'
         },
         body: JSON.stringify({
-          _subject: `Urgent: Dental Lead - ${name}`,
+          _subject: subject,
           "Lead Name": name,
           "Phone Number": phone,
           "Email Address": email,
+          "Interest": treatmentInterest || "General",
           "Chat Transcript": transcript
         })
       });
