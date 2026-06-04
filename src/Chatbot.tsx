@@ -119,17 +119,19 @@ Interest/Context: ${treatmentInterest || 'General'}
 ${transcript}
       `.trim();
 
-      await fetch('/api/send-lead', {
+      // Formsubmit AJAX allows sending directly from frontend
+      await fetch('https://formsubmit.co/ajax/madudimcjx@gmail.com', {
         method: "POST",
         headers: { 
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
         body: JSON.stringify({
-          name,
-          phone: phone || "Not provided",
-          email: email || "Not provided",
-          treatmentInterest: treatmentInterest || "General",
-          transcript
+          _subject: `New AI Chat Lead: ${name}`,
+          name: name || "Unknown Lead",
+          email: email || "no-email@provided.com",
+          message: emailContent,
+          _captcha: "false"
         })
       });
 
