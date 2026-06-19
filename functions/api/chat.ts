@@ -54,12 +54,14 @@ export const onRequestPost = async (context: any) => {
     }));
 
     const response = await aiClient.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3.1-flash-preview',
       contents: contents,
       config: {
         systemInstruction: leadCaptured ? getPostCapturePrompt() : getSystemPrompt(),
         tools: [{ functionDeclarations: leadCaptured ? [updateLeadDeclaration] : [captureLeadDeclaration] }],
-        toolConfig: { includeServerSideToolInvocations: true }
+        toolConfig: { includeServerSideToolInvocations: true },
+        maxOutputTokens: 150,
+        temperature: 0.7
       }
     });
 
