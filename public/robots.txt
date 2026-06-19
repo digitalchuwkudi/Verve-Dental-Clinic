@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://vervedental.com/sitemap.xml

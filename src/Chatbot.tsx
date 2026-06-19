@@ -11,12 +11,24 @@ export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>(() => {
     const saved = localStorage.getItem('verve_chat_history');
-    if (saved) {
+    const timestamp = localStorage.getItem('verve_chat_timestamp');
+    const now = Date.now();
+    
+    // Check if 6 hours have passed (6 * 60 * 60 * 1000 = 21600000)
+    if (saved && timestamp && now - parseInt(timestamp, 10) < 21600000) {
       try {
         return JSON.parse(saved);
       } catch (e) {
         // failed to parse
       }
+    } else if (saved) {
+      // Expired or missing timestamp: clear cache
+      localStorage.removeItem('verve_chat_history');
+      localStorage.removeItem('verve_lead_captured');
+      localStorage.removeItem('verve_lead_name');
+      localStorage.removeItem('verve_chat_timestamp');
+      // For cases where we just reload, we might need to reset state in localStorage, 
+      // but standard reset behavior on reload works by returning the default below.
     }
     return [
       { role: 'model', content: "Your privacy is our priority. This conversation is secure and HIPAA/GDPR compliant." },
@@ -28,6 +40,7 @@ export default function Chatbot() {
   const [isListening, setIsListening] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [leadCaptured, setLeadCaptured] = useState(() => {
+    // If we just cleared it above, this will return false
     return localStorage.getItem('verve_lead_captured') === 'true';
   });
   const [leadNameState, setLeadNameState] = useState(() => {
@@ -41,6 +54,7 @@ export default function Chatbot() {
 
   useEffect(() => {
     localStorage.setItem('verve_chat_history', JSON.stringify(messages));
+    localStorage.setItem('verve_chat_timestamp', Date.now().toString());
     messagesRef.current = messages;
   }, [messages]);
 
@@ -91,10 +105,16 @@ export default function Chatbot() {
 
     // Exit Intent Detection
     const handleMouseLeave = (e: MouseEvent) => {
-      if (e.clientY <= 0 && !hasAutoOpened.current) {
-        setIsOpen(true);
-        hasAutoOpened.current = true;
-        if (!leadCapturedRef.current) {
+      // Only capture exit intent if they've had some interaction, avoiding it popping up on page load
+      if (e.clientY <= 0) {
+        if (!hasAutoOpened.current) {
+          setIsOpen(true);
+          hasAutoOpened.current = true;
+        }
+        
+        // Only ask if they have more questions if we actually had a chat (more than 2 initial messages)
+        // AND lead is already captured, they are about to leave, so we ask if they have any more questions
+        if (leadCapturedRef.current && messagesRef.current.length > 2) {
            setMessages(prev => {
              if (prev.length > 0 && prev[prev.length - 1].content.includes("Wait!")) return prev;
              return [...prev, { role: 'model', content: "Wait! Do you have more questions about our treatments and service before you go?" }];
