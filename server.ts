@@ -58,7 +58,7 @@ async function startServer() {
       }));
 
       const response = await aiClient.models.generateContent({
-        model: 'gemini-3.1-flash-preview',
+        model: 'gemini-3.5-flash',
         contents: contents,
         config: {
           systemInstruction: leadCaptured ? getPostCapturePrompt() : getSystemPrompt(),
