@@ -111,15 +111,6 @@ export default function Chatbot() {
           setIsOpen(true);
           hasAutoOpened.current = true;
         }
-        
-        // Only ask if they have more questions if we actually had a chat (more than 2 initial messages)
-        // AND lead is already captured, they are about to leave, so we ask if they have any more questions
-        if (leadCapturedRef.current && messagesRef.current.length > 2) {
-           setMessages(prev => {
-             if (prev.length > 0 && prev[prev.length - 1].content.includes("Wait!")) return prev;
-             return [...prev, { role: 'model', content: "Wait! Do you have more questions about our treatments and service before you go?" }];
-           });
-        }
       }
     };
     document.addEventListener('mouseleave', handleMouseLeave);
@@ -184,8 +175,21 @@ ${transcript}
       });
       // Email is already forwarded upon capture, so we just end the chat smoothly.
     }, 5 * 60 * 1000); // 5 minutes timeout
+    
+    // 1-minute "Wait!" message
+    const reminderTimer = setTimeout(() => {
+      setMessages(prev => {
+        if (prev.length > 0 && prev[prev.length - 1].content.includes("Wait!")) return prev;
+        if (prev.length > 0 && prev[prev.length - 1].role === 'user') return prev; // User kept typing
+        if (prev.length > 0 && prev[prev.length - 1].content.includes("stepped away")) return prev; // Already closed
+        return [...prev, { role: 'model', content: "Wait! Do you have more questions about our treatments and service before you go?" }];
+      });
+    }, 60 * 1000); // 1 minute timeout
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(reminderTimer);
+    };
   }, [messages, leadCaptured]);
 
   const scrollToBottom = () => {
@@ -270,11 +274,11 @@ ${transcript}
       console.error("AI Error:", error);
       
       const rawError = typeof error?.message === 'string' ? error.message : "Unknown error";
-      let friendlyMessage = "Sorry, I'm having trouble connecting to the network right now. Please try again in a moment.";
+      let friendlyMessage = `Sorry, I'm having trouble connecting to the network right now. (${rawError})`;
       
       if (rawError.includes("429") || rawError.toLowerCase().includes("quota") || rawError.includes("RESOURCE_EXHAUSTED")) {
         friendlyMessage = "I am currently receiving a massive volume of messages and need a quick breather! Please wait a moment and try again.";
-      } else if (rawError.toLowerCase().includes("api key not valid") || rawError.includes("API_KEY_INVALID")) {
+      } else if (rawError.toLowerCase().includes("api key not valid") || rawError.includes("API_KEY_INVALID") || rawError.includes("API key not configured")) {
         friendlyMessage = "The chat system is currently down for maintenance (API Configuration Error).";
       }
 
