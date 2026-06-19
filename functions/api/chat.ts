@@ -59,7 +59,6 @@ export const onRequestPost = async (context: any) => {
       config: {
         systemInstruction: leadCaptured ? getPostCapturePrompt() : getSystemPrompt(),
         tools: [{ functionDeclarations: leadCaptured ? [updateLeadDeclaration] : [captureLeadDeclaration] }],
-        toolConfig: { includeServerSideToolInvocations: true },
         maxOutputTokens: 150,
         temperature: 0.7
       }
